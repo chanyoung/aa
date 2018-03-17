@@ -60,7 +60,13 @@ function makeBackupDir() {
 }
 
 function dumpMysql() {
-	 mysqldump -h$wgDBserver -u$wgDBuser -p$wgDBpassword $wgDBname | gzip > $BACKUPDIR/sql.gz
+	mysqldump -h$wgDBserver -u$wgDBuser -p$wgDBpassword $wgDBname | gzip > $BACKUPDIR/sql.gz
+}
+
+function archiveWiki() {
+	cd $WIKIDIR
+	tar cf $BACKUPDIR/mediawiki.tar .
+	cd -
 }
 
 function main() {
@@ -72,6 +78,9 @@ function main() {
 
 	# Dump mysql.
 	dumpMysql
+
+	# Archive wiki.
+	archiveWiki
 }
 
 while getopts p:o:dh o; do

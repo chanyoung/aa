@@ -12,10 +12,13 @@ wgDBname=""
 wgDBuser=""
 wgDBpassword=""
 
+BACKUPDIR="~/mediawiki-backup"
+
 usage() {
 	echo
 	echo "Usage $0 [-p] [-h]"
 	echo "  -p [path] mediawiki installed path"
+	echo "  -o [out] mediawiki backup files output path"
 	echo "  -d debug"
 	echo "  -h show this screen"
 	echo
@@ -44,16 +47,21 @@ function getConfigVariables() {
 }
 
 function main() {
+	echo $BACKUPDIR
+
 	getConfigVariables
 }
 
-while getopts p:dh o; do
+while getopts p:o:dh o; do
 	case $o in
 	d)
 		DEBUG=true
 		;;
 	p)
 		WIKIDIR=$OPTARG
+		;;
+	o)
+		BACKUPDIR=$OPTARG
 		;;
 	h)
 		usage

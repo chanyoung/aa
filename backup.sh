@@ -7,12 +7,14 @@ DEBUG=false
 WIKIDIR="."
 CFGFILE="LocalSettings.php"
 
-REQVARS=("wgDBname" "wgDBuser" "wgDBpassword")
+REQVARS=("wgDBserver" "wgDBname" "wgDBuser" "wgDBpassword")
+wgDBserver=""
 wgDBname=""
 wgDBuser=""
 wgDBpassword=""
 
 BACKUPDIR="~/mediawiki-backup"
+VERSION=""
 
 usage() {
 	echo
@@ -46,10 +48,30 @@ function getConfigVariables() {
 	fi
 }
 
-function main() {
-	echo $BACKUPDIR
+function timestamp() {
+	date +"%Y-%m-%d_%T"
+}
 
+function makeBackupDir() {
+	VERSION=$(timestamp)
+	
+	BACKUPDIR=$BACKUPDIR/$VERSION
+	mkdir -p $BACKUPDIR
+}
+
+function dumpMysql() {
+	 mysqldump -h$wgDBserver -u$wgDBuser -p$wgDBpassword $wgDBname | gzip > $BACKUPDIR/sql.gz
+}
+
+function main() {
+	# Get required config variables from mediawiki installed directory.
 	getConfigVariables
+
+	# Make backup directory.
+	makeBackupDir
+
+	# Dump mysql.
+	dumpMysql
 }
 
 while getopts p:o:dh o; do

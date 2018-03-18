@@ -65,7 +65,7 @@ function dumpMysql() {
 
 function archiveWiki() {
 	cd $WIKIDIR
-	tar cf $BACKUPDIR/mediawiki.tar .
+	tar czf $BACKUPDIR/mediawiki.tar.gz .
 	cd -
 }
 

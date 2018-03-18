@@ -16,6 +16,8 @@ wgDBpassword=""
 BACKUPDIR="~/mediawiki-backup"
 VERSION=""
 
+BACKUPMSG="This wiki is currently being backed-up. Please try it later."
+
 usage() {
 	echo
 	echo "Usage $0 [-p] [-h]"
@@ -24,6 +26,14 @@ usage() {
 	echo "  -d debug"
 	echo "  -h show this screen"
 	echo
+}
+
+function stopWiki() {
+	echo "\$wgReadOnly = '$BACKUPMSG';" >> $WIKIDIR/$CFGFILE
+}
+
+function restartWiki() {
+	sed -i "/$BACKUPMSG/d" $WIKIDIR/$CFGFILE
 }
 
 function getConfigVariables() {
@@ -70,6 +80,9 @@ function archiveWiki() {
 }
 
 function main() {
+	# Make wiki readonly.
+	stopWiki
+
 	# Get required config variables from mediawiki installed directory.
 	getConfigVariables
 
@@ -81,6 +94,9 @@ function main() {
 
 	# Archive wiki.
 	archiveWiki
+
+	# Make wiki writable.
+	restartWiki
 }
 
 while getopts p:o:dh o; do

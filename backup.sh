@@ -18,11 +18,14 @@ VERSION=""
 
 BACKUPMSG="This wiki is currently being backed-up. Please try it later."
 
+ROTATENUM=14
+
 usage() {
 	echo
 	echo "Usage $0 [-p] [-h]"
 	echo "  -p [path] mediawiki installed path"
-	echo "  -o [out] mediawiki backup files output path"
+	echo "  -o [path] mediawiki backup files output path"
+	echo "  -r [number] mediawiki backup rotate number"
 	echo "  -d debug"
 	echo "  -h show this screen"
 	echo
@@ -79,7 +82,24 @@ function archiveWiki() {
 	cd -
 }
 
+function rotateBackup() {
+	local backups=($(ls -1 $BACKUPDIR))
+	local delta=$((${#backups[@]} - ROTATENUM))
+
+	if [ $delta -lt 1 ]; then
+		return
+	fi
+
+	for i in $(eval echo "{1..$delta}"); do
+		echo remove old backup: $BACKUPDIR/${backups[$i]}
+		rm -rf $BACKUPDIR/${backups[$i]}
+	done
+}
+
 function main() {
+	# Rotate backups
+	rotateBackup
+
 	# Make wiki readonly.
 	stopWiki
 
@@ -99,7 +119,7 @@ function main() {
 	restartWiki
 }
 
-while getopts p:o:dh o; do
+while getopts p:o:r:dh o; do
 	case $o in
 	d)
 		DEBUG=true
@@ -109,6 +129,9 @@ while getopts p:o:dh o; do
 		;;
 	o)
 		BACKUPDIR=$OPTARG
+		;;
+	r)
+		ROTATENUM=$OPTARG
 		;;
 	h)
 		usage

@@ -14,7 +14,8 @@ install:
 	install_path=$$(readlink -f $$install_path); \
 	read -p "Enter your backup files output directory path: " out_path; \
 	out_path=$$(readlink -f $$out_path); \
-	($(CRONTAB) -l; echo "0 */12 * * * $(INSTALL_DIR)/$(PROGRAM) -p $$install_path -o $$out_path") | $(CRONTAB) -
+	read -p "Enter your number of backups for rotating: " backup_rotate; \
+	($(CRONTAB) -l; echo "0 */12 * * * $(INSTALL_DIR)/$(PROGRAM) -p $$install_path -o $$out_path -r $$backup_rotate") | $(CRONTAB) -
 
 .PHONY: uninstall
 uninstall:
